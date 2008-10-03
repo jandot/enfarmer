@@ -1,0 +1,37 @@
+This is an attempt at writing an Array method that runs a block on each of its
+elements on a farm.
+
+Syntax might look like this:
+<pre>
+  list_of_files.parallelize(:queue => 'urgent',
+                            :max_concurrent => 5,
+                            :select => '[mem >= 1000]') do |file_name|
+    File.open(file_name).each do |line|
+      # do something
+    end
+  end
+</pre>
+
+There should also be a way to know what the exit code of the job is.
+
+This would be equivalent to the approach followed at the moment:
+* Write a script that takes a filename as argument (e.g. called script.rb).
+<pre>
+  File.open(ARGV[0]).each do |line|
+    # do something
+  end
+</pre>
+
+* Write a bash script that calls script.rb for each file:
+<pre>
+  script.rb file_1.txt
+  script.rb file_2.txt
+  script.rb file_3.txt
+  script.rb file_4.txt
+  ...
+</pre>
+
+* Submit this bash script as a job array:
+<pre>
+  bsub -J"foobar[1-50]%10" ...
+</pre>
